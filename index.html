@@ -136,25 +136,18 @@
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 
   /* ── game-body: ห่อ grid + buttons ── */
+/* ── game-body: ห่อ grid + buttons ── */
   #game-body {
     flex: 1;
     min-height: 0;
     width: 100%;
     display: flex;
-    gap: 8px;
+    gap: 12px;
     overflow: hidden;
-
-    /* mobile default: column */
+    
+    /* 1. สำหรับมือถือ (ตารางอยู่บน ปุ่มอยู่ล่าง) */
     flex-direction: column;
     align-items: stretch;
-  }
-
-  /* คอม/แท็บเล็ต: row */
-  @media (min-width: 700px) {
-    #game-body {
-      flex-direction: row;
-      align-items: stretch;   /* แก้: flex-start → stretch ให้สองฝั่งสูงเท่ากัน */
-    }
   }
 
   /* ── grid side ── */
@@ -162,96 +155,22 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    /* mobile: เต็มความกว้าง */
     width: 100%;
     flex-shrink: 0;
   }
 
-  @media (min-width: 700px) {
-    #grid-side {
-      /* desktop: ใช้ flex:none + width คงที่ ไม่ยืดทับ btn-side */
-      flex: none;
-      width: 52%;          /* แก้: จาก min(55%,480px) → 52% คงที่ */
-      height: 100%;
-    }
-  }
-
-  /* grid-wrap เป็น square เสมอ */
+  /* grid-wrap เป็น square เสมо */
   #grid-wrap {
     width: 100%;
-    /* mobile: ให้ grid เป็นสี่เหลี่ยมตาม width */
     aspect-ratio: 1;
   }
-
-  @media (min-width: 700px) {
-    #grid-wrap {
-      /* desktop: สูงตาม parent แต่ไม่เกิน width */
-      width: auto;
-      aspect-ratio: 1;
-      height: 100%;
-      max-width: 100%;
-    }
-  }
-
-  #grid {
-    display: grid;
-    border: 2px solid var(--accent);
-    border-radius: 6px;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 0 20px rgba(100,200,255,.15);
-  }
-
-  .cell {
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer;
-    font-family:'Space Mono',monospace; color:#1a2540; font-weight:700;
-    background:var(--cell-empty);
-    border:.5px solid rgba(100,120,180,.3);
-    transition:all .15s; text-align:center; padding:1px; line-height:1.2;
-    user-select:none;
-    font-size: clamp(6px, min(1.8vw, 1.6vh), 13px);
-    /* mobile: aspect-ratio ทำให้เป็นสี่เหลี่ยมจัตุรัส */
-    aspect-ratio: 1;
-  }
-
-  @media (min-width: 700px) {
-    .cell {
-      /* desktop: ไม่ต้อง aspect-ratio เพราะ grid จัดให้อยู่แล้ว */
-      aspect-ratio: unset;
-      font-size: clamp(7px, min(1.4vw, 1.4vh), 13px);
-    }
-  }
-
-  .cell.locked   { background:var(--cell-locked); }
-  .cell.selected { background:var(--cell-select); color:white; box-shadow:inset 0 0 0 2px #fff; }
-  .cell.correct  { background:var(--cell-correct); animation:pop .2s; }
-  .cell.wrong    { background:var(--cell-wrong); animation:wobble .3s; }
-  .cell.empty    { color:var(--dim); }
-  .cell:hover:not(.locked):not(.correct) { filter:brightness(.9); }
-  @keyframes pop    { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
-  @keyframes wobble { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-3deg)} 75%{transform:rotate(3deg)} }
-  .box-right  { border-right: 2px solid var(--accent) !important; }
-  .box-bottom { border-bottom: 2px solid var(--accent) !important; }
 
   /* ── btn side ── */
   #btn-side {
-    flex: 1;
-    min-height: 0;
-    min-width: 0;
-    width: 0;          /* บังคับไม่ให้ขยายเกิน flex container */
+    width: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-  }
-
-  /* mobile: btn-side กลับมาเป็นความกว้างเต็ม */
-  @media (max-width: 699px) {
-    #btn-side {
-      width: 100%;
-      flex: none;
-    }
   }
 
   #btn-label {
@@ -261,11 +180,7 @@
     letter-spacing: 1px;
     margin-bottom: 4px;
     flex-shrink: 0;
-    /* ซ่อนบนมือถือ เพราะพื้นที่น้อย */
-    display: none;
-  }
-  @media (min-width: 700px) {
-    #btn-label { display: block; }
+    display: none; /* ซ่อนบนมือถือเพื่อประหยัดพื้นที่ */
   }
 
   #btn-pool {
@@ -274,46 +189,53 @@
     width: 100%;
     overflow: hidden;
     align-content: start;
-
-    /* mobile: 6 คอลัมน์ เหมือนเดิม */
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(6, 1fr); /* มือถือเรียง 6 คอลัมน์ */
   }
 
-  @media (min-width: 700px) {
-    #btn-pool {
-      /* desktop: 3 คอลัมน์ เพราะพื้นที่แคบลง (อยู่ฝั่งขวา) */
-      grid-template-columns: repeat(3, 1fr);
+  /* 2 & 3. สำหรับคอมพิวเตอร์ และ แท็บเล็ต (หน้าจอตั้งแต่ 768px ขึ้นไป) */
+  /* ตารางอยู่ซ้าย 65% ปุ่มคำตอบอยู่ขวา 35% */
+  @media (min-width: 768px) {
+    #game-body {
+      flex-direction: row; /* เรียงซ้าย-ขวา */
+    }
+
+    #grid-side {
+      flex: none;
+      width: 65%; /* ฝั่งซ้าย 65% */
       height: 100%;
-      gap: 5px;
+      padding-right: 10px;
     }
-  }
 
-  @media (min-width: 900px) {
+    #grid-wrap {
+      width: auto;
+      aspect-ratio: 1;
+      height: 100%;
+      max-width: 100%;
+    }
+
+    #btn-side {
+      flex: none;
+      width: 35%; /* ฝั่งขวา 35% */
+      height: 100%;
+    }
+
+    #btn-label { 
+      display: block; 
+    }
+
     #btn-pool {
-      /* wide desktop: 4 คอลัมน์ */
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr); /* เรียง 3 คอลัมน์ */
+      height: 100%;
+      gap: 6px;
     }
   }
 
-  .num-btn {
-    border:none; cursor:pointer; border-radius:6px;
-    padding: clamp(4px,0.8vh,8px) 3px;
-    background:#1e3060; border:1px solid #3a5090;
-    display:flex; flex-direction:column; align-items:center; transition:all .15s;
+  /* เสริมสำหรับจอคอมพิวเตอร์ขนาดใหญ่ */
+  @media (min-width: 1024px) {
+    #btn-pool {
+      grid-template-columns: repeat(4, 1fr); /* จอใหญ่มากเรียง 4 คอลัมน์ */
+    }
   }
-  .num-btn .nb-text {
-    font-family:'Space Mono',monospace;
-    font-size: clamp(7px, min(1.6vw,1.4vh), 11px);
-    color:var(--text); text-align:center; line-height:1.3;
-  }
-  .num-btn .nb-count {
-    font-size: clamp(7px,1.2vh,9px);
-    color:var(--gold); margin-top:1px; font-family:'Space Mono',monospace;
-  }
-  .num-btn.active { background:#1a4090; border-color:var(--accent); box-shadow:0 0 8px rgba(100,200,255,.2); }
-  .num-btn.active .nb-text { color:white; }
-  .num-btn.used   { background:#131d35; border-color:#2a3555; opacity:.45; cursor:default; }
-  .num-btn:hover:not(.used) { transform:translateY(-1px); filter:brightness(1.2); }
 
   /* ── Popup ── */
   #popup-overlay {
@@ -544,6 +466,26 @@ function closePopup(){document.getElementById('popup-overlay').classList.add('hi
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!==id));}
 
 (()=>{const w=document.getElementById('bg-circles');for(let i=0;i<8;i++){const s=document.createElement('span'),sz=60+i*60;s.style.cssText=`width:${sz}px;height:${sz}px;opacity:${0.04+i*.015}`;w.appendChild(s);}})();
+// ฟังก์ชันตรวจสอบและทำงานตามประเภทอุปกรณ์
+function checkDeviceAndInit() {
+  const width = window.innerWidth;
+  
+  if (width < 768) {
+    console.log("ระบบ: ตรวจพบเวอร์ชัน [มือถือ] - ปรับตารางอยู่บน ปุ่มอยู่ล่าง");
+    // คุณสามารถใส่โค้ดที่ต้องการให้รันเฉพาะบนมือถือเพิ่มตรงนี้ได้
+  } else if (width >= 768 && width < 1024) {
+    console.log("ระบบ: ตรวจพบเวอร์ชัน [แท็บเล็ต] - ปรับ Layout ตารางซ้าย 65% ขวา 35%");
+    // คุณสามารถใส่โค้ดที่ต้องการให้รันเฉพาะบนแท็บเล็ตเพิ่มตรงนี้ได้
+  } else {
+    console.log("ระบบ: ตรวจพบเวอร์ชัน [คอมพิวเตอร์] - ปรับ Layout ตารางซ้าย 65% ขวา 35%");
+    // คุณสามารถใส่โค้ดที่ต้องการให้รันเฉพาะบนคอมพิวเตอร์เพิ่มตรงนี้ได้
+  }
+}
+
+// เรียกใช้งานทันทีเมื่อเปิดหน้าเว็บ
+window.addEventListener('DOMContentLoaded', checkDeviceAndInit);
+// เรียกใช้งานซ้ำเมื่อผู้ใช้หมุนหน้าจอหรือปรับขนาดหน้าต่างเบราว์เซอร์
+window.addEventListener('resize', checkDeviceAndInit);
 </script>
 </body>
 </html>
