@@ -104,7 +104,7 @@
   .btn-diff:hover { transform:translateY(-2px) scale(1.02); filter:brightness(1.2); }
 
   /* ════════════════════════════════════════
-     GAME SCREEN NEW LAYOUT
+     GAME SCREEN LAYOUT SYSTEM
   ════════════════════════════════════════ */
   #game-screen {
     padding: 10px;
@@ -132,7 +132,7 @@
   .heart.shake { animation:shake .3s; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 
-  /* โครงสร้างห่อหุ้มหลัก */
+  /* แผงรวมร่างหลัก */
   #game-body {
     flex: 1;
     min-height: 0;
@@ -140,11 +140,12 @@
     display: flex;
     overflow: hidden;
     
-    /* โหมดเริ่มต้น: มือถือ (ตารางอยู่บน ปุ่มคำตอบอยู่ล่าง) */
+    /* ระบบเริ่มต้น: [มือถือ] เรียงจากบนลงล่าง */
     flex-direction: column;
     gap: 12px;
   }
 
+  /* กล่องฝั่งตาราง */
   #grid-side {
     display: flex;
     justify-content: center;
@@ -153,9 +154,10 @@
     flex-shrink: 0;
   }
 
+  /* ตัวครอบคุมสัดส่วนสี่เหลี่ยมจัตุรัสของตาราง */
   #grid-wrap {
     width: 100%;
-    max-width: 340px; /* จำกัดขนาดตารางบนมือถือไม่ให้ล้นจอ */
+    max-width: 330px; /* บังคับไม่ให้ตารางล้นจอมือถือแนวตั้ง */
     aspect-ratio: 1;
   }
 
@@ -172,4 +174,361 @@
   .cell {
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
-    font-family:'Space Mono',monospace; color:#1a2540; font-weight:7
+    font-family:'Space Mono',monospace; color:#1a2540; font-weight:700;
+    background:var(--cell-empty);
+    border:.5px solid rgba(100,120,180,.3);
+    transition:all .15s; text-align:center; padding:2px; line-height:1.2;
+    user-select:none;
+    font-size: clamp(9px, 2.5vw, 13px);
+  }
+
+  .cell.locked   { background:var(--cell-locked); }
+  .cell.selected { background:var(--cell-select); color:white; box-shadow:inset 0 0 0 2px #fff; }
+  .cell.correct  { background:var(--cell-correct); animation:pop .2s; }
+  .cell.wrong    { background:var(--cell-wrong); animation:wobble .3s; }
+  .cell.empty    { color:var(--dim); }
+  .cell:hover:not(.locked):not(.correct) { filter:brightness(.9); }
+  @keyframes pop    { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
+  @keyframes wobble { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-3deg)} 75%{transform:rotate(3deg)} }
+  .box-right  { border-right: 2px solid var(--accent) !important; }
+  .box-bottom { border-bottom: 2px solid var(--accent) !important; }
+
+  /* กล่องฝั่งปุ่มกดตัวเลือก */
+  #btn-side {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+
+  #btn-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  #btn-pool {
+    display: grid;
+    gap: 6px;
+    width: 100%;
+    /* บนมือถือ: เรียงปุ่มเป็น 5 คอลัมน์ แนวนอน */
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .num-btn {
+    border:none; cursor:pointer; border-radius:6px;
+    padding: 8px 4px;
+    background:#1e3060; border:1px solid #3a5090;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all .15s;
+  }
+  .num-btn .nb-text {
+    font-family:'Space Mono',monospace;
+    font-size: clamp(9px, 2.2vw, 12px);
+    color:var(--text); text-align:center; line-height:1.2;
+    word-break: break-all;
+  }
+  .num-btn .nb-count {
+    font-size: 9px;
+    color:var(--gold); margin-top:2px; font-family:'Space Mono',monospace;
+  }
+  .num-btn.active { background:#1a4090; border-color:var(--accent); box-shadow:0 0 8px rgba(100,200,255,.2); }
+  .num-btn.active .nb-text { color:white; }
+  .num-btn.used   { background:#131d35; border-color:#2a3555; opacity:.45; cursor:default; }
+  .num-btn:hover:not(.used) { transform:translateY(-1px); filter:brightness(1.2); }
+
+  /* ════════════════════════════════════════
+     RESPONSIVE: บังคับแยกร่างสำหรับ TABLET & PC
+  ════════════════════════════════════════ */
+  
+  /* ถ้าจอใหญ่กว่า 767px (ครอบคลุมทั้ง Tablet และ PC ยึดสัดส่วน 65% / 35% ตายตัว) */
+  @media (min-width: 768px) {
+    #game-body {
+      flex-direction: row;   /* พลิกแถวเป็นแนวนอน (ซ้าย-ขวา) */
+      gap: 20px;
+    }
+
+    #grid-side {
+      width: 65%;            /* บังคับตารางฝั่งซ้ายใช้พื้นที่ 65% ถ้วน */
+      height: 100%;
+      justify-content: flex-end; /* จัดตารางชิดขวาของกล่องซ้ายเพื่อให้สมดุลตรงกลาง */
+    }
+
+    #grid-wrap {
+      width: 100%;
+      max-width: 480px;      /* ขยายขนาดตารางเต็มที่บนจอใหญ่ */
+      aspect-ratio: 1;
+    }
+
+    #btn-side {
+      width: 35%;            /* บังคับกลุ่มปุ่มฝั่งขวาใช้พื้นที่ 35% ถ้วน */
+      height: 100%;
+      overflow-y: auto;
+      justify-content: flex-start;
+    }
+
+    #btn-label {
+      text-align: left;
+    }
+
+    #btn-pool {
+      /* แบ่งปุ่มกดออกเป็น 3 คอลัมน์ เพื่อความสวยงามในแนวตั้งฝั่งขวา */
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    
+    .cell {
+      font-size: clamp(10px, 1.4vw, 14px);
+    }
+  }
+
+  /* ถ้าเป็น PC จอใหญ่มากๆ (กว้างกว่า 1024px) ขยายช่องปุ่มให้เป็น 4 แถวเพื่อความง่ายในการหาฟังก์ชัน */
+  @media (min-width: 1025px) {
+    #btn-pool {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  /* ── Popup ── */
+  #popup-overlay {
+    position:absolute; inset:0;
+    background:rgba(0,0,0,.72);
+    display:flex; align-items:center; justify-content:center;
+    z-index:100; backdrop-filter:blur(4px);
+  }
+  #popup-overlay.hidden { display:none; }
+  .popup-card {
+    background:var(--panel); border:2px solid var(--accent);
+    border-radius:20px;
+    padding: clamp(24px,4vh,40px) clamp(20px,4vw,36px);
+    text-align:center; width:min(300px,85vw);
+    box-shadow:0 0 60px rgba(100,200,255,.2);
+    animation:popup-in .3s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes popup-in { from{transform:scale(.7);opacity:0} to{transform:scale(1);opacity:1} }
+  .popup-icon  { font-size:clamp(32px,7vw,44px); margin-bottom:8px; }
+  .popup-title { font-family:'Space Mono',monospace; font-size:clamp(16px,4vw,24px); font-weight:700; margin-bottom:6px; }
+  .popup-sub   { color:var(--dim); font-size:clamp(11px,2vw,13px); margin-bottom:14px; }
+  .popup-time  { font-family:'Space Mono',monospace; color:var(--gold); font-size:clamp(13px,2.5vw,16px); margin-bottom:16px; }
+  .btn-ok {
+    background:linear-gradient(135deg,#1e3a6e,#2a5298);
+    color:var(--accent); border:2px solid var(--accent);
+    border-radius:12px; padding:10px 40px;
+    font-family:'Space Mono',monospace; font-size:clamp(13px,2.5vw,15px); font-weight:700;
+    cursor:pointer; transition:all .2s;
+  }
+  .btn-ok:hover { box-shadow:0 0 20px rgba(100,200,255,.3); transform:translateY(-2px); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bg-circles" id="bg-circles"></div>
+
+  <div class="screen" id="first-screen">
+    <div class="title-wrap">
+      <div class="title-trig">TRIG</div>
+      <div class="title-sudoku">SUDOKU</div>
+      <div class="subtitle">TRIGONOMETRY PUZZLE GAME</div>
+    </div>
+    <button class="btn btn-primary" onclick="showScreen('select-screen')">▶&nbsp; PLAY</button>
+  </div>
+
+  <div class="screen hidden" id="select-screen">
+    <h2 style="font-family:'Space Mono',monospace;color:var(--accent);letter-spacing:2px;margin-bottom:clamp(14px,3vh,28px);font-size:clamp(13px,3vw,17px);">SELECT DIFFICULTY</h2>
+    <div class="diff-btns">
+      <button class="btn-diff btn-easy"   onclick="startGame('Easy')"><span class="d-name">EASY</span><span class="d-desc">6×6 | Degrees (°)</span></button>
+      <button class="btn-diff btn-medium" onclick="startGame('Medium')"><span class="d-name">MEDIUM</span><span class="d-desc">9×9 | Radians (π)</span></button>
+      <button class="btn-diff btn-hard"   onclick="startGame('Hard')"><span class="d-name">HARD</span><span class="d-desc">9×9 | Mixed</span></button>
+    </div>
+    <button class="btn btn-back" style="margin-top:clamp(14px,3vh,28px)" onclick="showScreen('first-screen')">← Back</button>
+  </div>
+
+  <div class="screen hidden" id="game-screen">
+    <div class="top-bar">
+      <button class="btn btn-back" onclick="showScreen('select-screen')">← Back</button>
+      <div class="timer" id="timer-display">00:00</div>
+      <div class="diff-badge" id="diff-badge">EASY</div>
+    </div>
+    <div class="hearts" id="hearts"></div>
+
+    <div id="game-body">
+      <div id="grid-side">
+        <div id="grid-wrap">
+          <div id="grid"></div>
+        </div>
+      </div>
+      <div id="btn-side">
+        <div id="btn-label">CHOOSE ANSWER</div>
+        <div id="btn-pool"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="popup-overlay" class="hidden">
+    <div class="popup-card">
+      <div class="popup-icon"  id="popup-icon"></div>
+      <div class="popup-title" id="popup-title"></div>
+      <div class="popup-sub"   id="popup-sub"></div>
+      <div class="popup-time"  id="popup-time"></div>
+      <button class="btn-ok" onclick="closePopup()">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TRIG={
+  1:{degree:["sin 270°","cos 180°","tan 135°"],radian:["sin 3π/2","cos π","tan 3π/4"]},
+  2:{degree:["sec 30°","cosec 60°"],radian:["sec π/6","cosec π/3"]},
+  3:{degree:["tan 60°","cot 30°"],radian:["tan π/3","cot π/6"]},
+  4:{degree:["sin 0°","cos 90°","tan 0°"],radian:["sin 0","cos π/2","tan 0"]},
+  5:{degree:["sin 90°","sec 0°","cot 45°"],radian:["sin π/2","sec 0","cot π/4"]},
+  6:{degree:["sin 30°","cos 60°"],radian:["sin π/6","cos π/3"]},
+  7:{degree:["sin 45°","cos 45°"],radian:["sin π/4","cos π/4"]},
+  8:{degree:["sin 60°","cos 30°"],radian:["sin π/3","cos π/6"]},
+  9:{degree:["tan 30°","cot 60°"],radian:["tan π/6","cot π/3"]},
+};
+function getDisp(k,fmt){
+  const p=fmt==='degree'?TRIG[k].degree:fmt==='radian'?TRIG[k].radian:[...TRIG[k].degree,...TRIG[k].radian];
+  return p[Math.floor(Math.random()*p.length)];
+}
+const ANS6=[[1,2,3,4,5,6],[4,5,6,1,2,3],[2,3,4,5,6,1],[5,6,1,2,3,4],[3,4,5,6,1,2],[6,1,2,3,4,5]];
+const ANS9=[[5,6,7,8,9,1,2,3,4],[8,9,1,2,3,4,5,6,7],[2,3,4,5,6,7,8,9,1],[3,4,5,6,7,8,9,1,2],[6,7,8,9,1,2,3,4,5],[9,1,2,3,4,5,6,7,8],[4,5,6,7,8,9,1,2,3],[7,8,9,1,2,3,4,5,6],[1,2,3,4,5,6,7,8,9]];
+
+let G={}, timerInterval=null;
+
+function startGame(diff){
+  clearInterval(timerInterval);
+  const isEasy=diff==='Easy', gs=isEasy?6:9;
+  const lc=isEasy?.70:diff==='Medium'?.50:.30;
+  const fmt=isEasy?'degree':diff==='Medium'?'radian':'mixed';
+  const ans=isEasy?ANS6:ANS9, bc=isEasy?18:36;
+  G={diff,gs,fmt,cells:[],selected:null,life:4,ended:false,elapsed:0,remaining:{},btnPool:[]};
+  for(let v=1;v<=gs;v++) G.remaining[v]=gs;
+  for(let r=0;r<gs;r++){
+    G.cells.push([]);
+    for(let c=0;c<gs;c++){
+      const v=ans[r][c],locked=Math.random()<lc,disp=locked?getDisp(v,fmt):'';
+      G.cells[r].push({correct:v,current:locked?v:0,disp,locked,state:locked?'locked':'empty'});
+      if(locked) G.remaining[v]--;
+    }
+  }
+  const pool=[];
+  for(let v=1;v<=gs;v++) for(let i=0;i<Math.floor(bc/gs);i++) pool.push(v);
+  pool.sort(()=>Math.random()-.5);
+  G.btnPool=pool.map(v=>({val:v,disp:getDisp(v,fmt)}));
+  showScreen('game-screen');
+  document.getElementById('diff-badge').textContent=diff.toUpperCase();
+  renderGrid(); renderButtons(); renderHearts();
+  G.startTime=Date.now();
+  timerInterval=setInterval(()=>{
+    if(!G.ended){G.elapsed=(Date.now()-G.startTime)/1000;document.getElementById('timer-display').textContent=fmtTime(G.elapsed);}
+  },500);
+}
+
+function fmtTime(s){const t=Math.floor(s);return`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;}
+
+function renderGrid(){
+  const grid=document.getElementById('grid'),{gs}=G;
+  grid.style.gridTemplateColumns=`repeat(${gs},1fr)`;
+  grid.innerHTML='';
+  for(let r=0;r<gs;r++) for(let c=0;c<gs;c++){
+    const cell=G.cells[r][c],el=document.createElement('div');
+    el.className='cell '+cell.state;
+    el.textContent=cell.disp;
+    if(gs===9){if((c+1)%3===0&&c<gs-1)el.classList.add('box-right');if((r+1)%3===0&&r<gs-1)el.classList.add('box-bottom');}
+    else{if((c+1)%3===0&&c<gs-1)el.classList.add('box-right');if((r+1)%2===0&&r<gs-1)el.classList.add('box-bottom');}
+    el.addEventListener('click',()=>clickCell(r,c));
+    grid.appendChild(el);
+  }
+}
+
+function updateCell(r,c){
+  const el=document.getElementById('grid').children[r*G.gs+c],cell=G.cells[r][c];
+  el.className=el.className.replace(/\b(locked|empty|selected|correct|wrong)\b/g,'').trim();
+  el.classList.add('cell',cell.state); el.textContent=cell.disp;
+}
+
+function renderButtons(){
+  const pool=document.getElementById('btn-pool');
+  pool.innerHTML='';
+  G.btnPool.forEach((btn,i)=>{
+    const rem=G.remaining[btn.val]||0,el=document.createElement('div');
+    el.className='num-btn '+(rem>0?'active':'used');
+    el.innerHTML=`<span class="nb-text">${btn.disp}</span><span class="nb-count">${rem}</span>`;
+    if(rem>0) el.addEventListener('click',()=>clickButton(i));
+    pool.appendChild(el);
+  });
+}
+
+function renderHearts(){
+  const h=document.getElementById('hearts'); h.innerHTML='';
+  for(let i=0;i<4;i++){const el=document.createElement('span');el.className='heart'+(i>=G.life?' empty':'');el.textContent='❤️';h.appendChild(el);}
+}
+
+function clickCell(r,c){
+  if(G.ended) return;
+  const cell=G.cells[r][c];
+  if(cell.locked&&(cell.state==='locked'||cell.state==='correct')) return;
+  if(G.selected){const[sr,sc]=G.selected,prev=G.cells[sr][sc];if(prev.state==='selected')prev.state=prev.current===0?'empty':prev.current===prev.correct?'correct':'wrong';updateCell(sr,sc);}
+  G.selected=[r,c]; cell.state='selected'; updateCell(r,c);
+}
+
+function clickButton(i){
+  if(G.ended||!G.selected) return;
+  const{val,disp}=G.btnPool[i];
+  if((G.remaining[val]||0)<=0) return;
+  const[r,c]=G.selected,cell=G.cells[r][c];
+  if(cell.locked&&(cell.state==='locked'||cell.state==='correct')) return;
+  cell.current=val; cell.disp=disp;
+  if(val===cell.correct){
+    cell.state='correct'; cell.locked=true;
+    G.remaining[val]=Math.max(0,(G.remaining[val]||0)-1);
+    G.selected=null; updateCell(r,c); renderButtons(); checkWin();
+  } else {
+    cell.state='wrong'; updateCell(r,c); G.life--;
+    renderHearts();
+    const hearts=document.querySelectorAll('.heart');
+    if(hearts[G.life]){hearts[G.life].classList.add('shake');setTimeout(()=>hearts[G.life]?.classList.remove('shake'),300);}
+    if(G.life<=0){G.ended=true;clearInterval(timerInterval);setTimeout(()=>showPopup(false),400);}
+  }
+}
+
+function checkWin(){
+  for(let r=0;r<G.gs;r++) for(let c=0;c<G.gs;c++) if(!G.cells[r][c].locked) return;
+  G.ended=true; clearInterval(timerInterval); setTimeout(()=>showPopup(true),400);
+}
+
+function showPopup(won){
+  document.getElementById('popup-icon').textContent=won?'🎉':'💔';
+  document.getElementById('popup-title').textContent=won?'YOU WIN!':'GAME OVER';
+  document.getElementById('popup-title').style.color=won?'var(--gold)':'var(--red)';
+  document.getElementById('popup-sub').textContent=won?'Congratulations!':'Better luck next time!';
+  document.getElementById('popup-time').textContent=won?'Time: '+fmtTime(G.elapsed):'';
+  document.getElementById('popup-overlay').classList.remove('hidden');
+}
+
+function closePopup(){document.getElementById('popup-overlay').classList.add('hidden');showScreen('select-screen');}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!==id));}
+
+// ฟังก์ชันตรวจสอบอุปกรณ์และบันทึกสถานะการทำงานตอนเริ่มระบบ
+function runDeviceDetection() {
+  const width = window.innerWidth;
+  if (width < 768) {
+    console.log("ระบบคัดกรอง: ตรวจพบ [มือถือ] จัด Layout บน-ล่าง สมบูรณ์");
+  } else if (width >= 768 && width <= 1024) {
+    console.log("ระบบคัดกรอง: ตรวจพบ [แท็บเล็ต] จัด Layout ซ้าย 65% / ขวา 35% สมบูรณ์");
+  } else {
+    console.log("ระบบคัดกรอง: ตรวจพบ [คอมพิวเตอร์ PC] จัด Layout ซ้าย 65% / ขวา 35% สมบูรณ์");
+  }
+}
+
+window.addEventListener('DOMContentLoaded', runDeviceDetection);
+window.addEventListener('resize', runDeviceDetection);
+
+(()=> {const w=document.getElementById('bg-circles');for(let i=0;i<8;i++){const s=document.createElement('span'),sz=60+i*60;s.style.cssText=`width:${sz}px;height:${sz}px;opacity:${0.04+i*.015}`;w.appendChild(s);}})();
+</script>
+</body>
+</html>
