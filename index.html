@@ -11,7 +11,6 @@
     --panel: #1a2540;
     --accent: #64c8ff;
     --gold: #ffd250;
-    --green: #6ee7b7;
     --red: #f87171;
     --text: #dce8ff;
     --dim: #6b7fa8;
@@ -21,39 +20,31 @@
     --cell-correct: #6ee7b7;
     --cell-wrong: #f87171;
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* แก้: html/body ต้องเป็น 100dvh ไม่ overflow */
   html, body {
-    width: 100%;
-    height: 100%;          /* เดิม: ไม่ได้กำหนด → ใหม่: 100% */
-    overflow: hidden;      /* เดิม: ไม่ได้กำหนด → ใหม่: hidden ป้องกัน scroll นอก app */
+    width: 100%; height: 100%;
+    overflow: hidden;
     background: var(--bg);
     color: var(--text);
     font-family: 'Sarabun', sans-serif;
   }
 
-  /* แก้: #app เป็น flex column เต็มจอ ไม่ overflow */
   #app {
-    width: 100%;
-    height: 100vh;         /* เดิม: 100vh + overflow:auto → ใหม่: 100vh + overflow:hidden */
-    height: 100dvh;        /* ใหม่: dvh รองรับ mobile browser bar */
-    max-width: 520px;
+    width: 100%; height: 100vh; height: 100dvh;
+    max-width: 1200px;
     margin: 0 auto;
-    overflow: hidden;      /* เดิม: auto → ใหม่: hidden ห้าม scroll */
+    overflow: hidden;
     background: var(--bg);
     position: relative;
   }
 
+  /* ── screens ── */
   .screen {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
     transition: opacity .25s, transform .25s;
   }
   .screen.hidden { opacity:0; pointer-events:none; transform:scale(.97); }
@@ -61,35 +52,34 @@
   .bg-circles { position:absolute; inset:0; overflow:hidden; pointer-events:none; }
   .bg-circles span {
     position:absolute; border-radius:50%;
-    border:1.5px solid rgba(100,200,255,.1);
+    border:1.5px solid rgba(100,200,255,.08);
     top:50%; left:50%; transform:translate(-50%,-60%);
   }
 
-  /* ── First Page ── */
-  .title-wrap { text-align:center; margin-bottom:32px; }
+  /* ── First page ── */
+  .title-wrap { text-align:center; margin-bottom:36px; }
   .title-trig, .title-sudoku {
     font-family:'Space Mono',monospace; font-weight:700;
     letter-spacing:4px; line-height:1;
-    /* แก้: clamp ยืดหยุ่นตาม viewport ทั้งกว้าง-สูง */
-    font-size: clamp(28px, min(9vw, 7vh), 52px);  /* เดิม: 52px → ใหม่: clamp */
+    font-size: clamp(28px, min(9vw,8vh), 56px);
   }
   .title-trig   { color:var(--accent); text-shadow:0 0 40px rgba(100,200,255,.4); }
   .title-sudoku { color:var(--text); }
-  .subtitle { color:var(--dim); font-size:clamp(11px,2vw,14px); margin-top:8px; letter-spacing:2px; }
+  .subtitle { color:var(--dim); font-size:clamp(11px,1.8vw,14px); margin-top:10px; letter-spacing:2px; }
 
   .btn {
     border:none; cursor:pointer;
     font-family:'Space Mono',monospace; font-weight:700;
     border-radius:14px; padding:14px 36px;
     transition:all .2s; letter-spacing:1px;
-    font-size:clamp(13px,3vw,16px);   /* เดิม: 16px → ใหม่: clamp */
+    font-size:clamp(13px,2.5vw,16px);
   }
   .btn-primary {
     background:linear-gradient(135deg,#1e3a6e,#2a5298);
     color:var(--accent); border:2px solid var(--accent);
     box-shadow:0 0 20px rgba(100,200,255,.15);
   }
-  .btn-primary:hover { background:linear-gradient(135deg,#2a5298,#3b6fd4); box-shadow:0 0 30px rgba(100,200,255,.3); transform:translateY(-2px); }
+  .btn-primary:hover { background:linear-gradient(135deg,#2a5298,#3b6fd4); transform:translateY(-2px); }
   .btn-back {
     background:transparent; color:var(--dim);
     border:1px solid var(--dim);
@@ -100,14 +90,10 @@
   .diff-btns { display:flex; flex-direction:column; gap:10px; width:100%; max-width:260px; }
   .btn-diff {
     border:none; cursor:pointer; border-radius:12px;
-    /* แก้: padding ยืดหยุ่น */
-    padding: clamp(10px,2vh,16px) 20px;  /* เดิม: 14px 20px → ใหม่: clamp */
+    padding:clamp(10px,1.5vh,14px) 20px;
     display:flex; flex-direction:column; align-items:center; transition:all .2s;
   }
-  .btn-diff .d-name {
-    font-family:'Space Mono',monospace; font-weight:700; letter-spacing:1px;
-    font-size:clamp(14px,4vw,18px);    /* เดิม: 18px → ใหม่: clamp */
-  }
+  .btn-diff .d-name { font-family:'Space Mono',monospace; font-weight:700; letter-spacing:1px; font-size:clamp(14px,3vw,18px); }
   .btn-diff .d-desc { font-size:11px; margin-top:2px; opacity:.7; }
   .btn-easy   { background:#0d2b1a; border:2px solid #6ee7b7; }
   .btn-easy   .d-name { color:#6ee7b7; }
@@ -117,49 +103,107 @@
   .btn-hard   .d-name { color:#f87171; }
   .btn-diff:hover { transform:translateY(-2px) scale(1.02); filter:brightness(1.2); }
 
-  /* ── Game Screen ── */
-  /* แก้: game-screen เป็น flex column เต็มความสูง ไม่ scroll */
+  /* ════════════════════════════════════════
+     GAME SCREEN
+     มือถือ  (<700px) : flex-column  (บน-ล่าง)
+     คอม/แท็บ (≥700px) : flex-row    (ซ้าย-ขวา)
+  ════════════════════════════════════════ */
   #game-screen {
-    padding: 8px 10px;
+    padding: 8px 10px 6px;
     justify-content: flex-start;
-    overflow: hidden;        /* เดิม: overflow-y:auto → ใหม่: hidden ไม่ scroll */
+    overflow: hidden;
     height: 100%;
   }
 
+  /* top bar คงที่ทุกหน้าจอ */
   .top-bar {
     width:100%; display:flex; align-items:center; justify-content:space-between;
-    /* แก้: margin/height ยืดหยุ่น */
-    margin-bottom: clamp(4px,1vh,8px);  /* เดิม: 6px → ใหม่: clamp */
+    height: clamp(28px,4vh,38px);
+    margin-bottom: clamp(3px,0.8vh,8px);
     flex-shrink: 0;
-    height: clamp(28px,4vh,36px);       /* เดิม: min-height:34px → ใหม่: clamp */
   }
-  .timer { font-family:'Space Mono',monospace; font-size:clamp(16px,4vw,20px); color:var(--accent); letter-spacing:2px; }
+  .timer { font-family:'Space Mono',monospace; font-size:clamp(15px,3.5vw,20px); color:var(--accent); letter-spacing:2px; }
   .diff-badge { font-size:11px; color:var(--dim); letter-spacing:1px; }
 
   .hearts {
-    display:flex; gap:6px; justify-content:center;
-    margin-bottom: clamp(3px,1vh,8px);  /* เดิม: 6px → ใหม่: clamp */
-    flex-shrink: 0;
+    display:flex; gap:5px; justify-content:center;
+    margin-bottom: clamp(3px,0.8vh,7px);
+    flex-shrink:0;
   }
-  .heart { font-size:clamp(14px,3vw,18px); transition:transform .2s; }  /* เดิม: 18px → ใหม่: clamp */
+  .heart { font-size:clamp(13px,2.5vw,18px); transition:transform .2s; }
   .heart.empty { filter:grayscale(1) opacity(.3); }
   .heart.shake { animation:shake .3s; }
   @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 
-  /* แก้: grid-wrap ใช้ flex-shrink:0 และ width เต็ม */
-  #grid-wrap {
+  /* ── game-body: ห่อ grid + buttons ── */
+  #game-body {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    overflow: hidden;
+
+    /* mobile default: column */
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  /* คอม/แท็บเล็ต: row */
+  @media (min-width: 700px) {
+    #game-body {
+      flex-direction: row;
+      align-items: stretch;   /* แก้: flex-start → stretch ให้สองฝั่งสูงเท่ากัน */
+    }
+  }
+
+  /* ── grid side ── */
+  #grid-side {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    /* mobile: เต็มความกว้าง */
     width: 100%;
     flex-shrink: 0;
-    margin-bottom: clamp(4px,1vh,8px);  /* เดิม: 8px → ใหม่: clamp */
   }
+
+  @media (min-width: 700px) {
+    #grid-side {
+      /* desktop: ใช้ flex:none + width คงที่ ไม่ยืดทับ btn-side */
+      flex: none;
+      width: 52%;          /* แก้: จาก min(55%,480px) → 52% คงที่ */
+      height: 100%;
+    }
+  }
+
+  /* grid-wrap เป็น square เสมอ */
+  #grid-wrap {
+    width: 100%;
+    /* mobile: ให้ grid เป็นสี่เหลี่ยมตาม width */
+    aspect-ratio: 1;
+  }
+
+  @media (min-width: 700px) {
+    #grid-wrap {
+      /* desktop: สูงตาม parent แต่ไม่เกิน width */
+      width: auto;
+      aspect-ratio: 1;
+      height: 100%;
+      max-width: 100%;
+    }
+  }
+
   #grid {
-    display:grid;
-    border:2px solid var(--accent);
-    border-radius:6px; overflow:hidden; width:100%;
-    box-shadow:0 0 20px rgba(100,200,255,.15);
+    display: grid;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0 0 20px rgba(100,200,255,.15);
   }
+
   .cell {
-    aspect-ratio:1;
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
     font-family:'Space Mono',monospace; color:#1a2540; font-weight:700;
@@ -167,57 +211,114 @@
     border:.5px solid rgba(100,120,180,.3);
     transition:all .15s; text-align:center; padding:1px; line-height:1.2;
     user-select:none;
-    /* แก้: font-size cell ยืดหยุ่นตาม vw และ vh */
-    font-size: clamp(6px, min(2vw, 1.8vh), 12px);  /* เดิม: clamp(7px,2.2vw,12px) → ใหม่: ใช้ min(vw,vh) */
+    font-size: clamp(6px, min(1.8vw, 1.6vh), 13px);
+    /* mobile: aspect-ratio ทำให้เป็นสี่เหลี่ยมจัตุรัส */
+    aspect-ratio: 1;
   }
+
+  @media (min-width: 700px) {
+    .cell {
+      /* desktop: ไม่ต้อง aspect-ratio เพราะ grid จัดให้อยู่แล้ว */
+      aspect-ratio: unset;
+      font-size: clamp(7px, min(1.4vw, 1.4vh), 13px);
+    }
+  }
+
   .cell.locked   { background:var(--cell-locked); }
   .cell.selected { background:var(--cell-select); color:white; box-shadow:inset 0 0 0 2px #fff; }
   .cell.correct  { background:var(--cell-correct); animation:pop .2s; }
   .cell.wrong    { background:var(--cell-wrong); animation:wobble .3s; }
-  .cell.empty    { background:var(--cell-empty); color:var(--dim); }
+  .cell.empty    { color:var(--dim); }
   .cell:hover:not(.locked):not(.correct) { filter:brightness(.9); }
   @keyframes pop    { 0%{transform:scale(1)} 50%{transform:scale(1.12)} 100%{transform:scale(1)} }
   @keyframes wobble { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-3deg)} 75%{transform:rotate(3deg)} }
-  .box-right  { border-right:2px solid var(--accent) !important; }
-  .box-bottom { border-bottom:2px solid var(--accent) !important; }
+  .box-right  { border-right: 2px solid var(--accent) !important; }
+  .box-bottom { border-bottom: 2px solid var(--accent) !important; }
 
-  /* แก้: btn-pool ใช้ flex-1 เพื่อกินพื้นที่ที่เหลือ ไม่ overflow */
+  /* ── btn side ── */
+  #btn-side {
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 0;          /* บังคับไม่ให้ขยายเกิน flex container */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* mobile: btn-side กลับมาเป็นความกว้างเต็ม */
+  @media (max-width: 699px) {
+    #btn-side {
+      width: 100%;
+      flex: none;
+    }
+  }
+
+  #btn-label {
+    font-family: 'Space Mono', monospace;
+    font-size: clamp(9px,1.5vw,12px);
+    color: var(--dim);
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+    /* ซ่อนบนมือถือ เพราะพื้นที่น้อย */
+    display: none;
+  }
+  @media (min-width: 700px) {
+    #btn-label { display: block; }
+  }
+
   #btn-pool {
     display: grid;
-    grid-template-columns: repeat(6,1fr);
-    gap: 3px;
+    gap: 4px;
     width: 100%;
-    flex: 1;               /* เดิม: flex-shrink:0 → ใหม่: flex:1 กินพื้นที่ที่เหลือ */
-    min-height: 0;         /* ใหม่: จำเป็นสำหรับ flex child ที่มี overflow */
-    overflow: hidden;      /* ใหม่: ไม่ให้ปุ่มล้นออก */
+    overflow: hidden;
     align-content: start;
+
+    /* mobile: 6 คอลัมน์ เหมือนเดิม */
+    grid-template-columns: repeat(6, 1fr);
   }
+
+  @media (min-width: 700px) {
+    #btn-pool {
+      /* desktop: 3 คอลัมน์ เพราะพื้นที่แคบลง (อยู่ฝั่งขวา) */
+      grid-template-columns: repeat(3, 1fr);
+      height: 100%;
+      gap: 5px;
+    }
+  }
+
+  @media (min-width: 900px) {
+    #btn-pool {
+      /* wide desktop: 4 คอลัมน์ */
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
   .num-btn {
     border:none; cursor:pointer; border-radius:6px;
-    /* แก้: padding ยืดหยุ่น */
-    padding: clamp(3px,0.8vh,6px) 2px;  /* เดิม: 5px 2px → ใหม่: clamp */
+    padding: clamp(4px,0.8vh,8px) 3px;
     background:#1e3060; border:1px solid #3a5090;
     display:flex; flex-direction:column; align-items:center; transition:all .15s;
   }
   .num-btn .nb-text {
     font-family:'Space Mono',monospace;
-    /* แก้: font-size ยืดหยุ่นทั้ง vw และ vh */
-    font-size: clamp(6px, min(1.8vw, 1.5vh), 10px);  /* เดิม: clamp(7px,2vw,10px) → ใหม่: min(vw,vh) */
+    font-size: clamp(7px, min(1.6vw,1.4vh), 11px);
     color:var(--text); text-align:center; line-height:1.3;
   }
   .num-btn .nb-count {
-    font-size: clamp(7px,1.5vh,9px);  /* เดิม: 9px → ใหม่: clamp */
+    font-size: clamp(7px,1.2vh,9px);
     color:var(--gold); margin-top:1px; font-family:'Space Mono',monospace;
   }
   .num-btn.active { background:#1a4090; border-color:var(--accent); box-shadow:0 0 8px rgba(100,200,255,.2); }
   .num-btn.active .nb-text { color:white; }
-  .num-btn.used   { background:#131d35; border-color:#2a3555; opacity:.5; cursor:default; }
+  .num-btn.used   { background:#131d35; border-color:#2a3555; opacity:.45; cursor:default; }
   .num-btn:hover:not(.used) { transform:translateY(-1px); filter:brightness(1.2); }
 
   /* ── Popup ── */
   #popup-overlay {
     position:absolute; inset:0;
-    background:rgba(0,0,0,.7);
+    background:rgba(0,0,0,.72);
     display:flex; align-items:center; justify-content:center;
     z-index:100; backdrop-filter:blur(4px);
   }
@@ -225,22 +326,21 @@
   .popup-card {
     background:var(--panel); border:2px solid var(--accent);
     border-radius:20px;
-    padding: clamp(24px,4vh,40px) clamp(20px,4vw,32px);  /* เดิม: 36px 28px → ใหม่: clamp */
-    text-align:center;
-    width:min(300px,85vw);
+    padding: clamp(24px,4vh,40px) clamp(20px,4vw,36px);
+    text-align:center; width:min(300px,85vw);
     box-shadow:0 0 60px rgba(100,200,255,.2);
     animation:popup-in .3s cubic-bezier(.34,1.56,.64,1);
   }
   @keyframes popup-in { from{transform:scale(.7);opacity:0} to{transform:scale(1);opacity:1} }
-  .popup-icon  { font-size:clamp(32px,8vw,44px); margin-bottom:8px; }
-  .popup-title { font-family:'Space Mono',monospace; font-size:clamp(16px,5vw,24px); font-weight:700; margin-bottom:6px; }
-  .popup-sub   { color:var(--dim); font-size:clamp(11px,2.5vw,13px); margin-bottom:14px; }
-  .popup-time  { font-family:'Space Mono',monospace; color:var(--gold); font-size:clamp(13px,3vw,16px); margin-bottom:16px; }
+  .popup-icon  { font-size:clamp(32px,7vw,44px); margin-bottom:8px; }
+  .popup-title { font-family:'Space Mono',monospace; font-size:clamp(16px,4vw,24px); font-weight:700; margin-bottom:6px; }
+  .popup-sub   { color:var(--dim); font-size:clamp(11px,2vw,13px); margin-bottom:14px; }
+  .popup-time  { font-family:'Space Mono',monospace; color:var(--gold); font-size:clamp(13px,2.5vw,16px); margin-bottom:16px; }
   .btn-ok {
     background:linear-gradient(135deg,#1e3a6e,#2a5298);
     color:var(--accent); border:2px solid var(--accent);
     border-radius:12px; padding:10px 40px;
-    font-family:'Space Mono',monospace; font-size:clamp(13px,3vw,15px); font-weight:700;
+    font-family:'Space Mono',monospace; font-size:clamp(13px,2.5vw,15px); font-weight:700;
     cursor:pointer; transition:all .2s;
   }
   .btn-ok:hover { box-shadow:0 0 20px rgba(100,200,255,.3); transform:translateY(-2px); }
@@ -250,6 +350,7 @@
 <div id="app">
   <div class="bg-circles" id="bg-circles"></div>
 
+  <!-- First -->
   <div class="screen" id="first-screen">
     <div class="title-wrap">
       <div class="title-trig">TRIG</div>
@@ -259,22 +360,18 @@
     <button class="btn btn-primary" onclick="showScreen('select-screen')">▶&nbsp; PLAY</button>
   </div>
 
+  <!-- Select -->
   <div class="screen hidden" id="select-screen">
-    <h2 style="font-family:'Space Mono',monospace;color:var(--accent);letter-spacing:2px;margin-bottom:clamp(16px,3vh,28px);font-size:clamp(13px,3.5vw,17px);">SELECT DIFFICULTY</h2>
+    <h2 style="font-family:'Space Mono',monospace;color:var(--accent);letter-spacing:2px;margin-bottom:clamp(14px,3vh,28px);font-size:clamp(13px,3vw,17px);">SELECT DIFFICULTY</h2>
     <div class="diff-btns">
-      <button class="btn-diff btn-easy"   onclick="startGame('Easy')">
-        <span class="d-name">EASY</span><span class="d-desc">6×6 | Degrees (°)</span>
-      </button>
-      <button class="btn-diff btn-medium" onclick="startGame('Medium')">
-        <span class="d-name">MEDIUM</span><span class="d-desc">9×9 | Radians (π)</span>
-      </button>
-      <button class="btn-diff btn-hard"   onclick="startGame('Hard')">
-        <span class="d-name">HARD</span><span class="d-desc">9×9 | Mixed</span>
-      </button>
+      <button class="btn-diff btn-easy"   onclick="startGame('Easy')"><span class="d-name">EASY</span><span class="d-desc">6×6 | Degrees (°)</span></button>
+      <button class="btn-diff btn-medium" onclick="startGame('Medium')"><span class="d-name">MEDIUM</span><span class="d-desc">9×9 | Radians (π)</span></button>
+      <button class="btn-diff btn-hard"   onclick="startGame('Hard')"><span class="d-name">HARD</span><span class="d-desc">9×9 | Mixed</span></button>
     </div>
-    <button class="btn btn-back" style="margin-top:clamp(16px,3vh,28px)" onclick="showScreen('first-screen')">← Back</button>
+    <button class="btn btn-back" style="margin-top:clamp(14px,3vh,28px)" onclick="showScreen('first-screen')">← Back</button>
   </div>
 
+  <!-- Game -->
   <div class="screen hidden" id="game-screen">
     <div class="top-bar">
       <button class="btn btn-back" onclick="showScreen('select-screen')">← Back</button>
@@ -282,10 +379,24 @@
       <div class="diff-badge" id="diff-badge">EASY</div>
     </div>
     <div class="hearts" id="hearts"></div>
-    <div id="grid-wrap"><div id="grid"></div></div>
-    <div id="btn-pool"></div>
+
+    <!-- game-body: ซ้าย-ขวา บน desktop / บน-ล่าง บน mobile -->
+    <div id="game-body">
+      <!-- ซ้าย: grid -->
+      <div id="grid-side">
+        <div id="grid-wrap">
+          <div id="grid"></div>
+        </div>
+      </div>
+      <!-- ขวา: ปุ่มตัวเลือก -->
+      <div id="btn-side">
+        <div id="btn-label">CHOOSE ANSWER</div>
+        <div id="btn-pool"></div>
+      </div>
+    </div>
   </div>
 
+  <!-- Popup -->
   <div id="popup-overlay" class="hidden">
     <div class="popup-card">
       <div class="popup-icon"  id="popup-icon"></div>
@@ -316,15 +427,15 @@ function getDisp(k,fmt){
 const ANS6=[[1,2,3,4,5,6],[4,5,6,1,2,3],[2,3,4,5,6,1],[5,6,1,2,3,4],[3,4,5,6,1,2],[6,1,2,3,4,5]];
 const ANS9=[[5,6,7,8,9,1,2,3,4],[8,9,1,2,3,4,5,6,7],[2,3,4,5,6,7,8,9,1],[3,4,5,6,7,8,9,1,2],[6,7,8,9,1,2,3,4,5],[9,1,2,3,4,5,6,7,8],[4,5,6,7,8,9,1,2,3],[7,8,9,1,2,3,4,5,6],[1,2,3,4,5,6,7,8,9]];
 
-let G={},timerInterval=null;
+let G={}, timerInterval=null;
 
 function startGame(diff){
   clearInterval(timerInterval);
-  const isEasy=diff==='Easy',gs=isEasy?6:9;
+  const isEasy=diff==='Easy', gs=isEasy?6:9;
   const lc=isEasy?.70:diff==='Medium'?.50:.30;
   const fmt=isEasy?'degree':diff==='Medium'?'radian':'mixed';
-  const ans=isEasy?ANS6:ANS9,bc=isEasy?18:36;
-  G={diff,gs,fmt,ans,cells:[],selected:null,life:4,ended:false,won:false,elapsed:0,remaining:{},btnPool:[]};
+  const ans=isEasy?ANS6:ANS9, bc=isEasy?18:36;
+  G={diff,gs,fmt,cells:[],selected:null,life:4,ended:false,elapsed:0,remaining:{},btnPool:[]};
   for(let v=1;v<=gs;v++) G.remaining[v]=gs;
   for(let r=0;r<gs;r++){
     G.cells.push([]);
@@ -417,7 +528,7 @@ function clickButton(i){
 
 function checkWin(){
   for(let r=0;r<G.gs;r++) for(let c=0;c<G.gs;c++) if(!G.cells[r][c].locked) return;
-  G.ended=true; G.won=true; clearInterval(timerInterval); setTimeout(()=>showPopup(true),400);
+  G.ended=true; clearInterval(timerInterval); setTimeout(()=>showPopup(true),400);
 }
 
 function showPopup(won){
@@ -432,7 +543,7 @@ function showPopup(won){
 function closePopup(){document.getElementById('popup-overlay').classList.add('hidden');showScreen('select-screen');}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!==id));}
 
-(()=>{const w=document.getElementById('bg-circles');for(let i=0;i<8;i++){const s=document.createElement('span'),sz=60+i*60;s.style.cssText=`width:${sz}px;height:${sz}px;opacity:${0.05+i*.02}`;w.appendChild(s);}})();
+(()=>{const w=document.getElementById('bg-circles');for(let i=0;i<8;i++){const s=document.createElement('span'),sz=60+i*60;s.style.cssText=`width:${sz}px;height:${sz}px;opacity:${0.04+i*.015}`;w.appendChild(s);}})();
 </script>
 </body>
 </html>
