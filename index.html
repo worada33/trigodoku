@@ -167,10 +167,11 @@
 
   /* ── btn side ── */
   #btn-side {
-    width: 100%;
+    width: 100%;          /* แก้ปัญหาในมือถือ: ให้ใช้พื้นที่เต็มความกว้าง */
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    flex-shrink: 0;
   }
 
   #btn-label {
@@ -180,60 +181,77 @@
     letter-spacing: 1px;
     margin-bottom: 4px;
     flex-shrink: 0;
-    display: none; /* ซ่อนบนมือถือเพื่อประหยัดพื้นที่ */
+    display: none;        /* โหมดมือถือ: ซ่อนเพื่อประหยัดพื้นที่แนวตั้ง */
   }
 
   #btn-pool {
     display: grid;
-    gap: 4px;
+    gap: 6px;
     width: 100%;
-    overflow: hidden;
     align-content: start;
-    grid-template-columns: repeat(6, 1fr); /* มือถือเรียง 6 คอลัมน์ */
+    /* โหมดมือถือ: เรียงปุ่มเป็น 6 คอลัมน์ แนวนอน */
+    grid-template-columns: repeat(6, 1fr); 
   }
 
-  /* 2 & 3. สำหรับคอมพิวเตอร์ และ แท็บเล็ต (หน้าจอตั้งแต่ 768px ขึ้นไป) */
-  /* ตารางอยู่ซ้าย 65% ปุ่มคำตอบอยู่ขวา 35% */
-  @media (min-width: 768px) {
+  /* ════════════════════════════════════════
+     RESPONSIVE LAYOUT FOR TABLET & PC
+  ════════════════════════════════════════ */
+  
+  /* [แท็บเล็ต] หน้าจอกว้างตั้งแต่ 768px ขึ้นไปแต่ไม่เกิน 1024px */
+  @media (min-width: 768px) and (max-width: 1024px) {
     #game-body {
-      flex-direction: row; /* เรียงซ้าย-ขวา */
+      flex-direction: row; /* เรียงแบบ คอมพิวเตอร์ (ซ้าย-ขวา) */
     }
-
     #grid-side {
       flex: none;
-      width: 65%; /* ฝั่งซ้าย 65% */
+      width: 65%;          /* ตารางฝั่งซ้าย 65% */
       height: 100%;
-      padding-right: 10px;
+      padding-right: 15px;
     }
-
     #grid-wrap {
       width: auto;
-      aspect-ratio: 1;
       height: 100%;
       max-width: 100%;
     }
-
     #btn-side {
       flex: none;
-      width: 35%; /* ฝั่งขวา 35% */
+      width: 35%;          /* ปุ่มฝั่งขวา 35% */
       height: 100%;
     }
-
     #btn-label { 
       display: block; 
     }
-
     #btn-pool {
-      grid-template-columns: repeat(3, 1fr); /* เรียง 3 คอลัมน์ */
-      height: 100%;
-      gap: 6px;
+      grid-template-columns: repeat(3, 1fr); /* แท็บเล็ตเรียงปุ่ม 3 คอลัมน์ */
     }
   }
 
-  /* เสริมสำหรับจอคอมพิวเตอร์ขนาดใหญ่ */
-  @media (min-width: 1024px) {
+  /* [คอมพิวเตอร์] หน้าจอกว้างตั้งแต่ 1025px ขึ้นไป */
+  @media (min-width: 1025px) {
+    #game-body {
+      flex-direction: row; /* เรียงซ้าย-ขวา */
+    }
+    #grid-side {
+      flex: none;
+      width: 65%;          /* ตารางฝั่งซ้าย 65% */
+      height: 100%;
+      padding-right: 20px;
+    }
+    #grid-wrap {
+      width: auto;
+      height: 100%;
+      max-width: 100%;
+    }
+    #btn-side {
+      flex: none;
+      width: 35%;          /* ปุ่มฝั่งขวา 35% */
+      height: 100%;
+    }
+    #btn-label { 
+      display: block; 
+    }
     #btn-pool {
-      grid-template-columns: repeat(4, 1fr); /* จอใหญ่มากเรียง 4 คอลัมน์ */
+      grid-template-columns: repeat(4, 1fr); /* คอมพิวเตอร์จอใหญ่เรียงปุ่ม 4 คอลัมน์ */
     }
   }
 
